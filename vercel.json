@@ -1,0 +1,16 @@
+{
+  "cleanUrls": true,
+  "outputDirectory": ".",
+  "redirects": [
+    {
+      "source": "/donate",
+      "destination": "https://checkout.square.site/merchant/MLJ5PH61AXA6B/checkout/ELKW6BQBBVY4ELAI3QT67YUJ",
+      "permanent": false
+    },
+    {
+      "source": "/donate.html",
+      "destination": "https://checkout.square.site/merchant/MLJ5PH61AXA6B/checkout/ELKW6BQBBVY4ELAI3QT67YUJ",
+      "permanent": false
+    }
+  ]
+}

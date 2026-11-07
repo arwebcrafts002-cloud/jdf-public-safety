@@ -1,0 +1,8 @@
+{
+  "name": "jdf-safety",
+  "version": "1.0.0",
+  "description": "JDF Public Safety Official Website",
+  "scripts": {
+    "build": "node -e \"console.log('Build successful: Static HTML5/CSS3/JS deployment ready.')\""
+  }
+}
