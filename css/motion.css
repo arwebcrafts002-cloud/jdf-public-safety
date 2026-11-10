@@ -369,7 +369,7 @@
 .x-amt[aria-pressed="true"] { background: var(--x-navy); border-color: var(--x-navy); box-shadow: 0 14px 30px rgba(11, 19, 41, .3); transform: translateY(-3px); }
 .x-amt[aria-pressed="true"] b { color: #fff; }
 .x-amt[aria-pressed="true"] span { color: #fbbf24; }
-.x-amt.pop::before { content: "Most chosen"; position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--x-gold-2); color: #fff; font: 800 9px var(--font-head); letter-spacing: .12em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.x-amt.pop::before { content: "Suggested"; position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--x-gold-2); color: #fff; font: 800 9px var(--font-head); letter-spacing: .12em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
 .x-custom { display: flex; align-items: center; gap: 10px; margin-top: 12px; border: 1.5px solid var(--slate-200); border-radius: 14px; padding: 4px 16px; transition: border-color .25s; }
 .x-custom:focus-within { border-color: var(--x-gold-2); }
 .x-custom span { font: 900 22px var(--font-head); color: var(--slate-400); }
