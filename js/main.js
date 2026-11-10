@@ -114,18 +114,30 @@
         btn.disabled = true;
       }
 
-      // Simulate submission feedback
-      setTimeout(function () {
-        const msg = document.createElement('div');
-        msg.style.cssText = 'background:#064e3b;border:1px solid #10b981;color:#ecfdf5;padding:16px 20px;border-radius:4px;margin-top:18px;font-weight:700;font-size:14px;';
-        msg.textContent = '✓ Your submission has been received. Our team will review it promptly.';
+      // Send to the intake endpoint. Never show a success message unless
+      // the submission was actually stored.
+      var payload = { type: form.getAttribute('data-intake') || 'contact', page: location.pathname };
+      new FormData(form).forEach(function (v, k) { if (typeof v === 'string') payload[k] = v.trim(); });
+
+      function note(ok) {
+        var old = form.querySelector('.form-result'); if (old) old.remove();
+        var msg = document.createElement('div');
+        msg.className = 'form-result';
+        msg.setAttribute('role', 'status');
+        msg.style.cssText = ok
+          ? 'background:#064e3b;border:1px solid #10b981;color:#ecfdf5;padding:16px 20px;border-radius:8px;margin-top:18px;font-weight:700;font-size:14px;'
+          : 'background:#7f1d1d;border:1px solid #f87171;color:#fef2f2;padding:16px 20px;border-radius:8px;margin-top:18px;font-weight:700;font-size:14px;line-height:1.6;';
+        msg.innerHTML = ok
+          ? 'Your submission has been received. Our team will review it promptly.'
+          : 'We could not send this online. Please call the Public Safety Hotline at <a href="tel:2132600061" style="text-decoration:underline;">(213) 260-0061</a> or email <a href="mailto:info@jdfpublicsafety.org" style="text-decoration:underline;">info@jdfpublicsafety.org</a>. For an emergency, call 911.';
         form.appendChild(msg);
-        form.reset();
-        if (btn) {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }
-      }, 800);
+        if (ok) form.reset();
+        if (btn) { btn.textContent = originalText; btn.disabled = false; }
+      }
+
+      fetch('/api/intake', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(function (r) { note(r.ok); })
+        .catch(function () { note(false); });
     });
   });
 
@@ -143,28 +155,6 @@
     });
   });
 
-  /* ---------- Animate on Scroll ------------------------------ */
-  if ('IntersectionObserver' in window) {
-    const style = document.createElement('style');
-    style.textContent = '.fade-in{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}.fade-in.visible{opacity:1;transform:none}';
-    document.head.appendChild(style);
-
-    document.querySelectorAll('.card, .pillar, .program-card, .report-card, .support-card, .board-member').forEach(function (el) {
-      el.classList.add('fade-in');
-    });
-
-    const observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.fade-in').forEach(function (el) {
-      observer.observe(el);
-    });
-  }
+  /* Scroll animation now lives in js/motion.js */
 
 })();

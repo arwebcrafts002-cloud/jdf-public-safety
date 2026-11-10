@@ -3,185 +3,338 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting to Secure Checkout | JDF Public Safety</title>
-  <meta name="description" content="Direct 256-bit encrypted checkout portal for JDF Public Safety community security initiatives.">
-  <meta http-equiv="refresh" content="0; url=https://checkout.square.site/merchant/MLJ5PH61AXA6B/checkout/ELKW6BQBBVY4ELAI3QT67YUJ">
+  <title>Donate | JDF Public Safety</title>
+  <meta name="description" content="Fund armed patrol, K-9 and 24/7 dispatch in Pico-Robertson and Beverlywood. Give once or monthly to JDF Public Safety.">
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    body {
-      background: #000c1e;
-      color: #ffffff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 24px;
-      font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-      text-align: center;
-      box-sizing: border-box;
-    }
-    .redirect-card {
-      background: #001938;
-      border: 1px solid rgba(214, 140, 4, 0.4);
-      border-radius: 20px;
-      padding: 48px 36px;
-      max-width: 540px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(214, 140, 4, 0.15);
-      position: relative;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
-    .redirect-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #D68C04, #f5b338, #D68C04);
-    }
-    .redirect-logo {
-      width: 88px;
-      height: 88px;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6));
-      animation: pulse-glow 2.2s infinite ease-in-out;
-    }
-    @keyframes pulse-glow {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6)); }
-      50% { transform: scale(1.04); filter: drop-shadow(0 8px 24px rgba(214, 140, 4, 0.5)); }
-    }
-    .redirect-title {
-      font-family: var(--font-head, inherit);
-      font-size: 24px;
-      font-weight: 900;
-      color: #ffffff;
-      margin: 0 0 10px 0;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .redirect-title span {
-      color: var(--gold, #D68C04);
-    }
-    .redirect-subtitle {
-      font-size: 14px;
-      color: var(--slate-300, #cbd5e1);
-      margin: 0 0 28px 0;
-      line-height: 1.6;
-    }
-    .spinner-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 30px;
-      color: var(--gold, #D68C04);
-      font-size: 13.5px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-    .spinner {
-      width: 22px;
-      height: 22px;
-      border: 3px solid rgba(214, 140, 4, 0.25);
-      border-top-color: var(--gold, #D68C04);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .direct-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background: linear-gradient(135deg, #e59a0e 0%, #D68C04 60%, #b87403 100%);
-      color: #001127 !important;
-      font-weight: 900;
-      font-size: 14px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: 16px 28px;
-      border-radius: 10px;
-      text-decoration: none !important;
-      box-shadow: 0 8px 24px rgba(214, 140, 4, 0.4);
-      transition: all .25s ease;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .direct-btn:hover {
-      background: linear-gradient(135deg, #f0a71f 0%, #D68C04 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(214, 140, 4, 0.6);
-    }
-    .security-note {
-      margin-top: 22px;
-      font-size: 12px;
-      color: var(--slate-400, #94a3b8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-weight: 600;
-    }
-    .back-link {
-      display: inline-block;
-      margin-top: 24px;
-      font-size: 13px;
-      color: var(--slate-400, #94a3b8);
-      text-decoration: none;
-      transition: color .2s ease;
-    }
-    .back-link:hover {
-      color: var(--gold, #D68C04);
-      text-decoration: underline;
-    }
-  </style>
-  <script>
-    // Immediate seamless routing to the official Square direct checkout portal
-    const checkoutUrl = "https://checkout.square.site/merchant/MLJ5PH61AXA6B/checkout/ELKW6BQBBVY4ELAI3QT67YUJ";
-    window.location.replace(checkoutUrl);
-  </script>
+  <link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 
-  <div class="redirect-card">
-    <img src="images/jdf-official-badge.png?v=140" alt="JDF Public Safety Shield" class="redirect-logo">
-    
-    <h1 class="redirect-title">JDF <span>PUBLIC SAFETY</span></h1>
-    <p class="redirect-subtitle">
-      Connecting to our official 501(c)(3) tax-deductible secure payment portal (Jewish Defense Federation)...
-    </p>
+        <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container">
+      <div class="navbar">
+        <a href="index.html" class="brand" aria-label="JDF Public Safety Home">
+        <img src="images/jdf-official-badge.png?v=140" alt="JDF Public Safety" class="brand-logo" width="74" height="74">
+        <div class="brand-text">
+          <strong>JDF Public Safety</strong>
+          <span>Prepared. Vigilant. United.</span>
+        </div>
+      </a>
 
-    <div class="spinner-wrap">
-      <div class="spinner"></div>
-      <span>Routing to Secure Checkout...</span>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="index.html" class="nav-item">Home</a>
+          <a href="about.html" class="nav-item">About</a>
+
+          <!-- Operations Dropdown -->
+          <div class="nav-dropdown">
+            <button class="dropdown-toggle" type="button" aria-expanded="false">
+              <span>Operations</span>
+              <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="operational-models.html" class="dropdown-link">
+                <span class="dropdown-title">Operational Models</span>
+                <span class="dropdown-desc">Framework for community defense &amp; response</span>
+              </a>
+              <a href="operational-procedures.html" class="dropdown-link">
+                <span class="dropdown-title">INCIDENT COMMAND &amp; PROTOCOLS</span>
+                <span class="dropdown-desc">Emergency dispatch hierarchy, codes &amp; tactical protocols</span>
+              </a>
+              <a href="training.html" class="dropdown-link">
+                <span class="dropdown-title">Training &amp; Preparedness</span>
+                <span class="dropdown-desc">Situational awareness &amp; emergency skills</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Initiatives Dropdown -->
+          <div class="nav-dropdown">
+            <button class="dropdown-toggle" type="button" aria-expanded="false">
+              <span>Initiatives</span>
+              <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="programs.html" class="dropdown-link">
+                <span class="dropdown-title">Programs</span>
+                <span class="dropdown-desc">Comprehensive community security initiatives</span>
+              </a>
+              <a href="technology.html" class="dropdown-link">
+                <span class="dropdown-title">Technology &amp; Intelligence</span>
+                <span class="dropdown-desc">AI surveillance, LPR &amp; real-time monitoring</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Community Dropdown (Streamlined) -->
+          <div class="nav-dropdown">
+            <button class="dropdown-toggle" type="button" aria-expanded="false">
+              <span>Community</span>
+              <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="community-network.html" class="dropdown-link">
+                <span class="dropdown-title">Community &amp; Partners</span>
+                <span class="dropdown-desc">Synagogues, schools, institutions &amp; coalition partners</span>
+              </a>
+              <a href="advisory-board.html" class="dropdown-link">
+                <span class="dropdown-title">Advisory Board</span>
+                <span class="dropdown-desc">Strategic guidance &amp; professional oversight</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Direct Single Link for Contact -->
+          <a href="contact.html" class="nav-item">Contact</a>
+        </nav>
+
+        <div class="nav-right">
+          <a href="tel:911" class="emergency-call-btn" aria-label="Emergency Call 911">
+            <span class="emergency-text">
+              <span class="emergency-label">Emergency Line</span>
+              <span class="emergency-title">CALL 911</span>
+            </span>
+          </a>
+          <a href="donate.html" class="top-cta">Donate Now</a>
+        </div>
+
+        <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
 
-    <a href="https://checkout.square.site/merchant/MLJ5PH61AXA6B/checkout/ELKW6BQBBVY4ELAI3QT67YUJ" target="_blank" rel="noopener noreferrer" class="direct-btn" id="manual-link">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-      </svg>
-      <span>Continue to Square Checkout</span>
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M5 12h14"></path>
-        <path d="m12 5 7 7-7 7"></path>
-      </svg>
-    </a>
+    <!-- Mobile Drawer with organized accordion/grouped categories -->
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <div class="mobile-nav-group">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+      </div>
+      <div class="mobile-nav-category">Operations</div>
+      <div class="mobile-nav-group">
+        <a href="operational-models.html">Operational Models</a>
+        <a href="operational-procedures.html">INCIDENT COMMAND &amp; PROTOCOLS</a>
+        <a href="training.html">Training &amp; Preparedness</a>
+      </div>
+      <div class="mobile-nav-category">Initiatives</div>
+      <div class="mobile-nav-group">
+        <a href="programs.html">Programs</a>
+        <a href="technology.html">Technology &amp; Intelligence</a>
+      </div>
+      <div class="mobile-nav-category">Community</div>
+      <div class="mobile-nav-group">
+        <a href="community-network.html">Community &amp; Partners</a>
+        <a href="advisory-board.html">Advisory Board</a>
+      </div>
+      <div class="mobile-nav-category">Contact</div>
+      <div class="mobile-nav-group">
+        <a href="contact.html">Contact Us</a>
+      </div>
+      <div class="mobile-nav-cta">
+        <a href="donate.html" class="btn gold" style="display:block;margin-bottom:10px;text-align:center;font-weight:900;letter-spacing:.06em;">Donate Now</a>
+        <a href="tel:2132600061" class="btn outline" style="display:block;text-align:center;color:#D68C04;border-color:#D68C04;">(213) 260-0061</a>
+      </div>
+    </nav>
+  </header>
 
-    <div class="security-note">
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span>256-Bit Encrypted Security Gateway via Square</span>
+  <main id="main">
+
+    <section class="x-give-hero x-grid-bg" aria-label="Donate">
+      <div class="container">
+        <p class="eyebrow" data-reveal>Funded by the community, protecting everyone</p>
+        <h1 data-reveal>Put a patrol unit <span>on the street.</span></h1>
+        <p data-reveal>Nobody signs a contract and nobody receives an invoice. The community funds the work together, and the whole community is protected.</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0;" aria-label="Donation form">
+      <div class="container">
+        <div class="x-give">
+
+          <form class="x-give-card" id="give" novalidate>
+            <div class="x-steps" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
+
+            <!-- STEP 1 -->
+            <div class="x-pane is-on" data-pane="1">
+              <h2 class="x-h">Choose your gift</h2>
+              <p class="x-sub">Every amount goes to work in Zone 1.</p>
+              <div class="x-freq" data-f="once" role="group" aria-label="Gift frequency">
+                <button type="button" data-freq="once" aria-pressed="true">Give once</button>
+                <button type="button" data-freq="monthly" aria-pressed="false">Monthly</button>
+              </div>
+              <div class="x-amts" role="group" aria-label="Gift amount">
+                <button type="button" class="x-amt" data-amt="18" aria-pressed="false"><b>$18</b><span>Chai</span></button>
+                <button type="button" class="x-amt" data-amt="36" aria-pressed="false"><b>$36</b><span>Double chai</span></button>
+                <button type="button" class="x-amt" data-amt="90" aria-pressed="false"><b>$90</b><span>1 patrol hour</span></button>
+                <button type="button" class="x-amt pop" data-amt="180" aria-pressed="true"><b>$180</b><span>2 patrol hours</span></button>
+                <button type="button" class="x-amt" data-amt="360" aria-pressed="false"><b>$360</b><span>4 patrol hours</span></button>
+                <button type="button" class="x-amt" data-amt="618" aria-pressed="false"><b>$618</b><span>7 patrol hours</span></button>
+                <button type="button" class="x-amt" data-amt="1800" aria-pressed="false"><b>$1,800</b><span>20 patrol hours</span></button>
+                <button type="button" class="x-amt" data-amt="3600" aria-pressed="false"><b>$3,600</b><span>40 patrol hours</span></button>
+              </div>
+              <label class="x-custom"><span>$</span><input type="text" inputmode="decimal" id="give-custom" placeholder="Other amount" aria-label="Other amount in dollars"></label>
+              <div class="x-impact" aria-live="polite">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span id="give-impact"></span>
+              </div>
+              <button type="button" class="x-btn-give" data-next="2">Continue</button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="x-pane" data-pane="2">
+              <h2 class="x-h">Your details</h2>
+              <p class="x-sub">So we can send your receipt and thank you properly.</p>
+              <div class="x-fields">
+                <div class="x-field"><label for="g-first">First name</label><input id="g-first" name="first_name" autocomplete="given-name" required></div>
+                <div class="x-field"><label for="g-last">Last name</label><input id="g-last" name="last_name" autocomplete="family-name" required></div>
+                <div class="x-field full"><label for="g-email">Email</label><input id="g-email" name="email" type="email" autocomplete="email" required></div>
+                <div class="x-field full"><label for="g-phone">Mobile phone (optional)</label><input id="g-phone" name="phone" type="tel" autocomplete="tel"></div>
+                <div class="x-field"><label for="g-ded-type">Dedication (optional)</label><select id="g-ded-type" name="dedication_type"><option value="">None</option><option value="honor">In honor of</option><option value="memory">In memory of</option></select></div>
+                <div class="x-field"><label for="g-ded">Name</label><input id="g-ded" name="dedication_name" placeholder="Who is this gift for?"></div>
+                <label class="x-check full"><input type="checkbox" name="anonymous"><span><b>Keep my gift anonymous.</b> We will never list your name publicly.</span></label>
+                <label class="x-check full"><input type="checkbox" name="newsletter" checked><span>Email me the community safety briefing. Unsubscribe any time.</span></label>
+                <label class="x-check full"><input type="checkbox" name="sms_consent"><span>Text me urgent community safety alerts. Message and data rates may apply. Reply STOP to opt out.</span></label>
+              </div>
+              <button type="button" class="x-btn-give" data-next="3">Review gift</button>
+              <button type="button" class="x-back" data-next="1">Back</button>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="x-pane" data-pane="3">
+              <h2 class="x-h">Review and give</h2>
+              <p class="x-sub">One more step to complete your gift.</p>
+              <div class="x-summary">
+                <div><span>Donor</span><b id="s-name"></b></div>
+                <div><span>Receipt to</span><b id="s-email"></b></div>
+                <div id="s-ded-row"><span>Dedication</span><b id="s-ded"></b></div>
+                <div><span>Recognition</span><b id="s-anon"></b></div>
+                <div class="tot"><span>Your gift</span><span id="s-total"></span></div>
+              </div>
+              <p class="x-notice" id="s-notice"></p>
+              <button type="submit" class="x-btn-give" id="give-submit">Continue to secure checkout</button>
+              <button type="button" class="x-back" data-next="2">Back</button>
+            </div>
+
+            <noscript><p class="x-notice" style="margin-top:16px;">This form needs JavaScript. You can still give directly on our secure Square checkout: <a href="https://checkout.square.site/merchant/MLJ5PH61AXA6B/checkout/ELKW6BQBBVY4ELAI3QT67YUJ" style="font-weight:800;text-decoration:underline;">donate with Square</a>.</p></noscript>
+            <div class="x-secure"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Payments are processed securely by Square. JDF never sees or stores your card number.</div>
+          </form>
+
+          <aside class="x-side">
+            <div class="x-side-card" data-reveal>
+              <h3>Sponsor a named capability</h3>
+              <div class="x-fund" data-inview>
+                <div><span>Three patrol SUVs <b>$110,000</b></span><i style="--w:100%"></i></div>
+                <div><span>Mobile Command Center <b>$65,000</b></span><i style="--w:59%;--d:120ms"></i></div>
+                <div><span>Communications and radio <b>$45,000</b></span><i style="--w:41%;--d:240ms"></i></div>
+                <div><span>Surveillance and technology <b>$43,500</b></span><i style="--w:40%;--d:360ms"></i></div>
+                <div><span>Bicycle ambassador program <b>$14,500</b></span><i style="--w:13%;--d:480ms"></i></div>
+              </div>
+              <p class="s">To sponsor a capability or discuss an annual partnership, call <a href="tel:2132600061" style="color:#e59a0e;font-weight:700;">(213) 260-0061</a> or write to <a href="mailto:info@jdfpublicsafety.org" style="color:#e59a0e;font-weight:700;">info@jdfpublicsafety.org</a>.</p>
+            </div>
+            <div class="x-side-card" data-reveal>
+              <h3>Other ways to give</h3>
+              <ul class="x-ways">
+                <li><b>By check</b>Payable to JDF Public Safety. <a href="contact.html">Ask us for the mailing address.</a></li>
+                <li><b>Wire or stock</b><a href="mailto:info@jdfpublicsafety.org">info@jdfpublicsafety.org</a></li>
+                <li><b>Employer matching</b>Many employers match charitable gifts. Ask your HR team.</li>
+                <li><b>By phone</b><a href="tel:2132600061">(213) 260-0061</a></li>
+              </ul>
+              <p class="s">JDF Public Safety is a 501(c)(3) nonprofit organization. Your donation is tax-deductible to the extent permitted by law.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIDEO TESTIMONIALS: placeholders until real ones are filmed -->
+    <section class="x-dark" aria-labelledby="voices-heading">
+      <div class="container">
+        <p class="kicker" data-reveal>Voices from the neighborhood</p>
+        <h2 id="voices-heading" data-reveal>Hear it from the people we protect</h2>
+        <div class="x-videos" data-stagger>
+          <div class="x-video"><div class="play" aria-hidden="true"></div><small>Video coming soon</small><b>A rabbi in Zone 1</b><span>On what a unit outside on Friday night means to a congregation.</span></div>
+          <div class="x-video"><div class="play" aria-hidden="true"></div><small>Video coming soon</small><b>A school leader</b><span>On drop-off, pick-up, and K-9 sweeps before the school day.</span></div>
+          <div class="x-video"><div class="play" aria-hidden="true"></div><small>Video coming soon</small><b>A neighbor</b><span>On walking home, and who answers when they call.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" aria-labelledby="faq-heading">
+      <div class="container">
+        <p class="kicker" style="text-align:center;">Questions</p>
+        <h2 id="faq-heading" style="text-align:center;">Before you give</h2>
+        <div class="x-faq" data-stagger>
+          <details><summary>Where does my gift go?</summary><p>To patrol, K-9 and dispatch operations in Zone 1, Pico-Robertson and Beverlywood, and to the vehicles, communications and equipment those teams need. Each dollar traces to an hour of coverage.</p></details>
+          <details><summary>Is JDF a private security company?</summary><p>No. JDF is a public safety nonprofit. Nobody signs a contract and nobody receives an invoice. Armed response is provided through a licensed California Private Patrol Operator.</p></details>
+          <details><summary>Does JDF replace the police?</summary><p>No. 911 comes first. Every criminal matter is escalated immediately to 911 and LAPD. JDF complements law enforcement and never replaces it.</p></details>
+          <details><summary>Can I give anonymously?</summary><p>Yes. Tick "Keep my gift anonymous" and your name will never be listed publicly. We still need an email address to send your receipt.</p></details>
+          <details><summary>Can I dedicate my gift?</summary><p>Yes. Choose "In honor of" or "In memory of" and add a name. It will appear on your receipt.</p></details>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+        <img src="images/jdf-official-badge.png?v=140" alt="JDF Public Safety" class="footer-logo" width="84" height="84">
+        <div class="footer-brand-text">
+          <strong>JDF Public Safety</strong>
+          <p>Community security for synagogues, schools, and neighborhoods across Los Angeles.</p>
+          <p style="margin-top:8px;"><strong style="color:#D68C04;">(213) 260-0061</strong></p>
+          <p><a href="mailto:info@jdfpublicsafety.org">info@jdfpublicsafety.org</a></p>
+        </div>
+      </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="operational-models.html">Operational Models</a>
+            <a href="programs.html">Programs</a>
+            <a href="training-preparedness.html">Training &amp; Preparedness</a>
+            <a href="technology-intelligence.html">Technology &amp; Intelligence</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Get Involved</h4>
+          <div class="footer-links">
+            <a href="community-network.html">Community Network</a>
+            <a href="advisory-board.html">Advisory Board</a>
+            <a href="support.html">Support JDF</a>
+            <a href="report-concern.html">Report a Concern</a>
+          </div>
+          <h4 style="margin-top:20px;">Location</h4>
+          <p>Los Angeles, CA<br>Serving the Greater Los Angeles Community</p>
+        </div>
+        <div class="footer-col">
+          <h4>Partnership</h4>
+          <div class="footer-partnership">
+            <p class="partnership-lead">YOUR SUPPORT HELPS US EXPAND PATROL COVERAGE AND PROTECT MORE FAMILIES.</p>
+            <p class="partnership-sub">EVERY CONTRIBUTION MAKES A DIFFERENCE.</p>
+            <div class="partnership-license">
+              <p class="partnership-provider">ARMED RESPONSE BY KD SECURITY</p>
+              <p class="partnership-ppo">PPO# 120677</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="smallprint">
+        <span>&copy; 2026 JDF Public Safety. All rights reserved.</span>
+        <span>Community Security in Los Angeles</span>
+      </div>
     </div>
-  </div>
-
-  <a href="index.html" class="back-link">&larr; Return to Home Page</a>
-
+  </footer>
+  <script src="js/main.js"></script>
+  <script src="js/motion.js"></script>
+  <script src="js/donate.js"></script>
 </body>
 </html>
