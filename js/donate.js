@@ -24,6 +24,51 @@
   var $$ = function (s) { return Array.prototype.slice.call(form.querySelectorAll(s)); };
   var money = function (n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
   var custom = document.getElementById('give-custom');
+  var byId = function (id) { return document.getElementById(id); };
+
+  /* Giving levels. Placeholders pending David's approval. The level is always
+     worked out from the amount; a tier name in the page address is ignored.
+     api/intake.js repeats this table and recomputes the level on the server. */
+  var TIERS = [
+    { slug: 'founder',   min: 3600, name: 'Founders Club', items: 'Numbered challenge coin, lapel pin, Founders Wall plaque, plus hat, shirt, patch set and sticker', shirt: true },
+    { slug: 'shield',    min: 1800, name: 'Shield',        items: 'Supporter patch set, shirt, hat, sticker and card, and your name on the supporters page', shirt: true },
+    { slug: 'guardian',  min: 618,  name: 'Guardian',      items: 'Shirt, hat, sticker and thank-you card', shirt: true },
+    { slug: 'supporter', min: 360,  name: 'Supporter',     items: 'Hat, sticker and thank-you card', shirt: false },
+    { slug: 'friend',    min: 180,  name: 'Friend',        items: 'Sticker and thank-you card', shirt: false }
+  ];
+
+  /* Levels apply to one-time gifts. The Founders Club needs an open seat; if all
+     seats are filled a gift of that size receives the Shield level instead. */
+  function tier() {
+    if (state.freq !== 'once' || !(state.amount >= 1)) return null;
+    var seats = window.JDF_FOUNDERS, full = seats && seats.open === 0;
+    for (var i = 0; i < TIERS.length; i++) {
+      if (state.amount >= TIERS[i].min && !(TIERS[i].slug === 'founder' && full)) return TIERS[i];
+    }
+    return null;
+  }
+
+  var merch = byId('merch'), optOut = byId('merch-opt'), wall = byId('g-wall'), wallTyped = '';
+
+  function merchUI() {
+    if (!merch) return;
+    var t = tier(), anon = form.elements.anonymous.checked;
+    merch.hidden = !t;
+    if (!t) return;
+    var founder = t.slug === 'founder';
+    byId('merch-line').innerHTML = 'This gift reaches the <b>' + t.name + '</b> level' + (founder ? ', limited to the first 20 founding donors' : '') + '. Included: ' + t.items + '.';
+    byId('merch-wall').hidden = !founder;
+    byId('merch-ship').hidden = optOut.checked;
+    byId('merch-size').hidden = !t.shirt;
+    if (anon) { if (!wall.disabled) wallTyped = wall.value; wall.value = 'Anonymous founder'; wall.disabled = true; }
+    else if (wall.disabled) { wall.disabled = false; wall.value = wallTyped; }
+    var sn = byId('g-ship-name');
+    if (!sn.value.trim()) sn.value = (byId('g-first').value.trim() + ' ' + byId('g-last').value.trim()).trim();
+  }
+  if (merch) {
+    optOut.addEventListener('change', merchUI);
+    form.elements.anonymous.addEventListener('change', merchUI);
+  }
 
   function impact() {
     var a = state.amount, el = document.getElementById('give-impact'), per = state.freq === 'monthly' ? ' every month' : '';
@@ -31,7 +76,8 @@
     var hrs = a / COST_PER_PATROL_HOUR, txt;
     if (hrs < 0.95) txt = '<b>' + money(a) + '</b>' + per + ' keeps a patrol unit on the street for about <b>' + Math.max(1, Math.round(hrs * 60)) + ' minutes</b>.';
     else txt = '<b>' + money(a) + '</b>' + per + ' funds about <b>' + (hrs < 10 ? (Math.round(hrs * 2) / 2) : Math.round(hrs)) + ' hours</b> of patrol coverage.';
-    el.innerHTML = txt + ' One deployed hour costs about $90.';
+    var t = tier();
+    el.innerHTML = txt + ' One deployed hour costs about $90.' + (t ? ' This gift reaches the <b>' + t.name + '</b> level.' : '');
   }
 
   function setAmount(a, fromCustom) {
@@ -66,6 +112,18 @@
       f.classList.toggle('bad', bad);
       if (bad) { ok = false; first = first || f; }
     });
+    var t = tier();
+    if (t && merch && !optOut.checked) {
+      var need = ['#g-ship-name', '#g-ship-a1', '#g-ship-city', '#g-ship-state', '#g-ship-zip'];
+      if (t.shirt) need.push('#g-size');
+      need.forEach(function (s) {
+        var f = $(s), v = f.value.trim(), bad = !v
+          || (s === '#g-ship-state' && !/^[A-Za-z]{2}$/.test(v))
+          || (s === '#g-ship-zip' && !/^\d{5}(-\d{4})?$/.test(v));
+        f.classList.toggle('bad', bad);
+        if (bad) { ok = false; first = first || f; }
+      });
+    }
     if (first) first.focus();
     return ok;
   }
@@ -78,6 +136,13 @@
     document.getElementById('s-ded-row').style.display = ded ? '' : 'none';
     document.getElementById('s-ded').textContent = ded ? (d.dedication_type === 'honor' ? 'In honor of ' : 'In memory of ') + d.dedication_name : '';
     document.getElementById('s-anon').textContent = d.anonymous ? 'Anonymous' : 'Named';
+    var t = tier();
+    byId('s-tier-row').style.display = t ? '' : 'none';
+    byId('s-items-row').style.display = t ? '' : 'none';
+    if (t) {
+      byId('s-tier').textContent = t.name + (t.slug === 'founder' ? ' (seat assigned when the gift is completed)' : '');
+      byId('s-items').textContent = d.merch_opt_out ? 'None. Whole gift counts.' : 'Shipped to ' + d.ship_city + ', ' + d.ship_state + (t.shirt ? ' · shirt ' + d.shirt_size : '');
+    }
     document.getElementById('s-total').textContent = money(state.amount) + (state.freq === 'monthly' ? ' / month' : '');
     document.getElementById('s-notice').textContent = state.freq === 'monthly'
       ? 'You will make your first ' + money(state.amount) + ' gift on our secure Square checkout. Enter ' + money(state.amount) + ' as the amount on the next screen. We will email you a secure link to set up the monthly schedule.'
@@ -87,6 +152,7 @@
   function go(n) {
     $$('.x-pane').forEach(function (p) { p.classList.toggle('is-on', Number(p.dataset.pane) === n); });
     $$('.x-steps span').forEach(function (s, i) { s.classList.toggle('on', i < n); });
+    if (n === 2) merchUI();
     if (n === 3) summary();
     var top = form.getBoundingClientRect().top + window.scrollY - 110;
     if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' });
@@ -108,6 +174,16 @@
     o.amount = state.amount;
     o.frequency = state.freq;
     o.page = location.pathname;
+
+    var t = tier(), ship = ['ship_name', 'ship_address1', 'ship_address2', 'ship_city', 'ship_state', 'ship_postal'];
+    o.tier = t ? t.slug : null;
+    o.merch_opt_out = t ? !!optOut.checked : true;
+    var sending = t && !o.merch_opt_out;
+    ship.forEach(function (k) { if (!sending) o[k] = ''; });
+    o.ship_state = (o.ship_state || '').toUpperCase();
+    o.shirt_size = sending && t.shirt ? o.shirt_size : '';
+    /* A disabled field is left out of FormData, so set the wall name by hand. */
+    o.wall_display_name = t && t.slug === 'founder' ? (o.anonymous ? 'Anonymous founder' : wall.value.trim()) : '';
     return o;
   }
 

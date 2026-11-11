@@ -30,17 +30,62 @@ const email = (v) => {
   return e && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e) ? e.toLowerCase() : undefined;
 };
 
+/* Giving levels (placeholders pending approval). Same table as js/donate.js.
+   The level is always recomputed here from the amount; the browser's value is
+   never trusted. Levels apply to one-time gifts only. Whether a founding seat
+   is actually still open is decided when the gift is paid, by
+   assign_founder_number() in db/founders.sql, not here. */
+const TIER_MINS = [['founder', 3600], ['shield', 1800], ['guardian', 618], ['supporter', 360], ['friend', 180]];
+const SHIRT_TIERS = ['guardian', 'shield', 'founder'];
+const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+const MERCH_FIELDS = ['tier', 'merch_opt_out', 'shirt_size', 'ship_name', 'ship_address1', 'ship_address2', 'ship_city', 'ship_state', 'ship_postal', 'wall_display_name'];
+
+function tierFor(amount, frequency) {
+  if (frequency !== 'once') return null;
+  const hit = TIER_MINS.find(([, min]) => amount >= min);
+  return hit ? hit[0] : null;
+}
+
+function merch(b, amount, frequency) {
+  const tier = tierFor(amount, frequency);
+  const optOut = !tier || b.merch_opt_out !== false;       // items ship only on an explicit "false"
+  // Validate the whole value before any trimming to length, so 'California' is not cut down to a valid-looking 'CA'.
+  const raw = (v) => (typeof v === 'string' ? v.trim() : '');
+  const state = raw(b.ship_state);
+  const postal = raw(b.ship_postal);
+  const size = raw(b.shirt_size).toUpperCase();
+  const out = {
+    tier,
+    merch_opt_out: optOut,
+    shirt_size: !optOut && SHIRT_TIERS.includes(tier) && SHIRT_SIZES.includes(size) ? size : null,
+    ship_name: optOut ? null : clean(b.ship_name, 120) || null,
+    ship_address1: optOut ? null : clean(b.ship_address1, 160) || null,
+    ship_address2: optOut ? null : clean(b.ship_address2, 160) || null,
+    ship_city: optOut ? null : clean(b.ship_city, 80) || null,
+    ship_state: !optOut && state && /^[A-Za-z]{2}$/.test(state) ? state.toUpperCase() : null,
+    ship_postal: !optOut && postal && /^\d{5}(-\d{4})?$/.test(postal) ? postal : null,
+    wall_display_name: tier === 'founder' ? (b.anonymous ? 'Anonymous founder' : clean(b.wall_display_name, 80) || null) : null,
+  };
+  // An incomplete address is stored as given (invalid parts become null) and never
+  // rejected: the donor is already on their way to checkout, and staff can follow up.
+  return out;
+}
+
 function row(type, b, meta) {
   if (type === 'donation_intent') {
     const amount = Number(b.amount);
     if (!email(b.email) || !(amount >= 1 && amount <= 250000)) return null;
+    const frequency = b.frequency === 'monthly' ? 'monthly' : 'once';
+    const m = merch(b, amount, frequency);
+    if (!m) return null;
     return {
+      ...m,
       first_name: clean(b.first_name, 80),
       last_name: clean(b.last_name, 80),
       email: email(b.email),
       phone: clean(b.phone, 40),
       amount_cents: Math.round(amount * 100),
-      frequency: b.frequency === 'monthly' ? 'monthly' : 'once',
+      frequency,
       dedication_type: ['honor', 'memory'].includes(b.dedication_type) ? b.dedication_type : null,
       dedication_name: clean(b.dedication_name, 160),
       is_anonymous: !!b.anonymous,
@@ -63,9 +108,11 @@ function row(type, b, meta) {
     };
   }
   if (type === 'contact') {
-    const rest = Object.assign({}, b);
-    delete rest.type;
-    delete rest.page;
+    if (!email(b.email || b.reporter_email) || !clean(b.message || b.description)) return null;
+    const rest = {};
+    for (const k of Object.keys(b).slice(0, 20)) {
+      if (k !== 'type' && k !== 'page' && k !== 'website' && typeof b[k] === 'string') rest[k.slice(0, 40)] = b[k].slice(0, 500);
+    }
     return {
       name: clean(b.name || b.reporter_name, 160),
       email: email(b.email || b.reporter_email),
@@ -83,7 +130,7 @@ function row(type, b, meta) {
 }
 
 async function insert(table, record) {
-  const res = await fetch(process.env.SUPABASE_URL + '/rest/v1/' + table, {
+  const res = await fetch(process.env.SUPABASE_URL + '/rest/v1/' + table + (table === 'subscribers' ? '?on_conflict=email' : ''), {
     method: 'POST',
     headers: {
       apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -93,10 +140,21 @@ async function insert(table, record) {
     },
     body: JSON.stringify(record),
   });
-  if (!res.ok) throw new Error('db ' + res.status + ': ' + (await res.text()));
+  if (res.ok) return;
+  const text = await res.text();
+  // db/founders.sql not applied yet: the level and shipping columns do not exist.
+  // Store the gift without them rather than lose the donor's details.
+  if (table === 'donation_intents' && /PGRST204|42703/.test(text) && MERCH_FIELDS.some((k) => k in record)) {
+    const slim = Object.assign({}, record);
+    MERCH_FIELDS.forEach((k) => delete slim[k]);
+    console.error('intake: merch columns missing, stored without them. Run db/founders.sql.');
+    return insert(table, slim);
+  }
+  throw new Error('db ' + res.status + ': ' + text);
 }
 
 async function notifyStaff(type, record) {
+  if (type === 'report') record = { notice: 'A new concern report was submitted. Read it in the database; contents are not emailed.', concern_type: record.concern_type };
   if (!process.env.RESEND_API_KEY || !process.env.STAFF_NOTIFY_TO || !process.env.EMAIL_FROM) return;
   const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
   const lines = Object.entries(record)
@@ -127,7 +185,10 @@ module.exports = async (req, res) => {
   }
   if (!body || typeof body !== 'object') return res.status(400).json({ ok: false, error: 'bad_json' });
 
-  const table = TYPES[body.type];
+  // Honeypot: a hidden field people never see. Bots fill it; answer OK and store nothing.
+  if (typeof body.website === 'string' && body.website.trim()) return res.status(200).json({ ok: true });
+
+  const table = Object.prototype.hasOwnProperty.call(TYPES, body.type) ? TYPES[body.type] : null;
   if (!table) return res.status(400).json({ ok: false, error: 'unknown_type' });
 
   const meta = { page: clean(body.page, 120), user_agent: clean(req.headers['user-agent'], 300) };
@@ -148,7 +209,7 @@ module.exports = async (req, res) => {
     await notifyStaff(body.type, record);
     return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error('intake failed', err);
+    console.error('intake failed', String(err && err.message).slice(0, 12));
     return res.status(502).json({ ok: false, error: 'storage_failed' });
   }
 };

@@ -17,6 +17,8 @@
 
   var taken = Math.max(0, Math.min(FOUNDERS_TOTAL, FOUNDERS_TAKEN));
   var open = FOUNDERS_TOTAL - taken;
+  /* Shared with js/donate.js so the donate form never offers a founding seat that does not exist. */
+  window.JDF_FOUNDERS = { total: FOUNDERS_TOTAL, taken: taken, open: open };
   var each = function (sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); };
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
 

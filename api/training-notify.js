@@ -23,11 +23,25 @@ async function sb(path, token) {
 }
 
 async function send(to, subject, html) {
-  await fetch('https://api.resend.com/emails', {
+  const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + process.env.RESEND_API_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: process.env.EMAIL_FROM, to, subject, html }),
   });
+  if (!r.ok) throw new Error('resend ' + r.status);
+}
+
+// Claim the one confirmation email for this registration. Returns true only for
+// the first caller, so replaying the request cannot send more mail.
+async function claim(sessionId, userId) {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const r = await fetch(process.env.SUPABASE_URL + '/rest/v1/registrations?session_id=eq.' + sessionId + '&user_id=eq.' + userId + '&notified_at=is.null&status=neq.cancelled', {
+    method: 'PATCH',
+    headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify({ notified_at: new Date().toISOString() }),
+  });
+  if (!r.ok) throw new Error('supabase ' + r.status);
+  return (await r.json()).length > 0;
 }
 
 module.exports = async (req, res) => {
@@ -44,13 +58,20 @@ module.exports = async (req, res) => {
   if (!token || !/^[0-9a-f-]{36}$/i.test(sessionId)) return res.status(400).json({ ok: false, error: 'bad_request' });
 
   try {
-    const user = await sb('/auth/v1/user', token);
+    let user;
+    try { user = await sb('/auth/v1/user', token); } catch (e) { return res.status(401).json({ ok: false, error: 'not_signed_in' }); }
+    if (!user || !/^[0-9a-f-]{36}$/i.test(String(user.id))) return res.status(401).json({ ok: false, error: 'not_signed_in' });
+
+    // The member must still be approved. A blocked member gets nothing, even with an old token.
+    const prof = await sb('/rest/v1/profiles?select=status&id=eq.' + user.id);
+    if (!prof[0] || prof[0].status !== 'approved' || !user.email_confirmed_at) return res.status(403).json({ ok: false, error: 'not_approved' });
     const regs = await sb('/rest/v1/registrations?select=status&session_id=eq.' + sessionId + '&user_id=eq.' + user.id);
     if (!regs.length || regs[0].status === 'cancelled') return res.status(404).json({ ok: false, error: 'no_registration' });
 
-    const sessions = await sb('/rest/v1/training_sessions?select=title,starts_at,ends_at,training_tracks(name),session_locations(venue,address,arrival_notes)&id=eq.' + sessionId);
+    const sessions = await sb('/rest/v1/training_sessions?select=title,status,starts_at,ends_at,training_tracks(name),session_locations(venue,address,arrival_notes)&id=eq.' + sessionId);
     const s = sessions[0];
-    if (!s) return res.status(404).json({ ok: false, error: 'no_session' });
+    if (!s || s.status !== 'scheduled' || new Date(s.starts_at) < new Date()) return res.status(404).json({ ok: false, error: 'no_session' });
+    if (!(await claim(sessionId, user.id))) return res.status(200).json({ ok: true, already_sent: true });
     let loc = s.session_locations;
     if (Array.isArray(loc)) loc = loc[0];
     const confirmed = regs[0].status === 'confirmed';
@@ -73,7 +94,7 @@ module.exports = async (req, res) => {
     }
     return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error('training-notify failed', err);
+    console.error('training-notify failed', String(err && err.message).slice(0, 12));
     return res.status(502).json({ ok: false, error: 'failed' });
   }
 };

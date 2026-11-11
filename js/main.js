@@ -20,7 +20,9 @@
   }
 
   /* ---------- Active Nav Link Detection --------------------- */
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  // Vercel serves clean URLs (/about), while links are written as about.html.
+  let currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  if (currentPage.indexOf('.') === -1) currentPage += '.html';
 
   // Direct nav items
   document.querySelectorAll('nav.main-nav .nav-item, .mobile-nav a').forEach(function (link) {

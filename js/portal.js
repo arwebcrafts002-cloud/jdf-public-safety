@@ -18,6 +18,8 @@
   var say = function (el, msg, bad) { if (!el) return; el.textContent = msg || ''; el.className = 'p-msg' + (msg ? (bad ? ' bad' : ' ok') : ''); };
 
   if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || !window.supabase) { show('offline'); return; }
+  // Read this before the client starts: supabase-js clears the address hash during startup.
+  var isRecovery = /type=recovery/.test(location.hash);
   var db = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
   var fmtDate = function (iso) { return new Date(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); };
@@ -43,7 +45,7 @@
       e.preventDefault();
       var f = e.target; say(msg, 'Signing in…');
       db.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value }).then(function (r) {
-        if (r.error) return say(msg, 'That email and password do not match an account.', true);
+        if (r.error) return say(msg, /confirm/i.test(r.error.message) ? 'Confirm your email first. Check your inbox for the link we sent.' : 'That email and password do not match an account.', true);
         location.href = 'trainings.html';
       });
     });
@@ -72,13 +74,20 @@
       });
     });
 
-    db.auth.onAuthStateChange(function (event) {
-      if (event !== 'PASSWORD_RECOVERY') return;
-      var pw = window.prompt('Choose a new password (at least 10 characters)');
-      if (pw && pw.length >= 10) db.auth.updateUser({ password: pw }).then(function (r) { say(msg, r.error ? r.error.message : 'Password updated. You are signed in.', !!r.error); });
+    $('#p-newpw').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var pw = e.target.password.value;
+      if (pw.length < 10) return say($('#p-newpw-msg'), 'Use a password of at least 10 characters.', true);
+      db.auth.updateUser({ password: pw }).then(function (r) {
+        if (r.error) return say($('#p-newpw-msg'), r.error.message, true);
+        location.href = 'trainings.html';
+      });
     });
 
-    db.auth.getSession().then(function (r) { if (r.data.session && !/type=recovery/.test(location.hash)) location.href = 'trainings.html'; else show('auth'); });
+    db.auth.getSession().then(function (r) {
+      if (isRecovery) return show(r.data.session ? 'newpw' : 'auth');
+      if (r.data.session) location.href = 'trainings.html'; else show('auth');
+    });
   }
 
   /* ---------------- trainings.html -------------------------- */
@@ -97,13 +106,14 @@
         (r[2].data || []).forEach(function (a) { reg[a.session_id] = a; });
         (r[3].data || []).forEach(function (a) { loc[a.session_id] = a; });
 
-        if (!sessions.length) { list.innerHTML = '<p class="p-empty">No sessions are scheduled yet. New dates are announced by email to members.</p>'; }
+        if (me.status !== 'approved') { list.innerHTML = '<p class="p-empty">The schedule appears here once your account is approved.</p>'; }
+        else if (!sessions.length) { list.innerHTML = '<p class="p-empty">No sessions are scheduled yet. Check back here for new dates.</p>'; }
         else list.innerHTML = sessions.map(function (s) {
           var left = Math.max(0, s.capacity - (taken[s.id] || 0)), mineReg = reg[s.id], l = loc[s.id], t = s.training_tracks || {};
           var action = mineReg
-            ? '<span class="p-pill ' + (mineReg.status === 'confirmed' ? 'ok' : 'wait') + '">' + (mineReg.status === 'confirmed' ? 'You are registered' : 'On the waitlist') + '</span><button class="p-link" data-cancel="' + s.id + '">Cancel my seat</button>'
+            ? '<span class="p-pill ' + (mineReg.status === 'confirmed' ? 'ok' : 'wait') + '">' + (mineReg.status === 'confirmed' ? 'You are registered' : 'On the waitlist') + '</span><button class="p-link" data-cancel="' + esc(s.id) + '">Cancel my seat</button>'
             : (me.status === 'approved'
-              ? '<button class="btn gold" data-register="' + s.id + '">' + (left ? 'Register' : 'Join waitlist') + '</button>'
+              ? '<button class="btn gold" data-register="' + esc(s.id) + '">' + (left ? 'Register' : 'Join waitlist') + '</button>'
               : '<span class="p-pill wait">Available once your account is approved</span>');
           return '<article class="p-session">' +
             '<div class="p-when"><b>' + esc(fmtDate(s.starts_at)) + '</b><span>' + esc(fmtTime(s.starts_at)) + (s.ends_at ? ' to ' + esc(fmtTime(s.ends_at)) : '') + '</span></div>' +
@@ -122,7 +132,7 @@
       if (r) {
         e.target.disabled = true;
         db.rpc('register_for_session', { p_session: r }).then(function (res) {
-          if (res.error) return say(msg, res.error.message === 'not_approved' ? 'Your account is still waiting for approval.' : 'That session is no longer available.', true);
+          if (res.error) { e.target.disabled = false; return say(msg, /not_approved/.test(res.error.message) ? 'Your account is still waiting for approval.' : 'That session is no longer available.', true); }
           say(msg, res.data === 'confirmed' ? 'Your seat is confirmed. The location is now shown below, and a confirmation email is on its way.' : 'The session is full. You are on the waitlist.');
           db.auth.getSession().then(function (s) {
             fetch('/api/training-notify', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + s.data.session.access_token }, body: JSON.stringify({ session_id: r }) }).catch(function () {});
@@ -137,7 +147,7 @@
       me = p || { status: 'pending' };
       $('#p-hello').textContent = me.full_name ? 'Welcome, ' + me.full_name.split(' ')[0] : 'Welcome';
       $('#p-status').hidden = me.status === 'approved';
-      $('#p-status').textContent = me.status === 'blocked' ? 'This account cannot register for training. Call (213) 260-0061 with questions.' : 'Your account is waiting for approval. JDF confirms every new member before sharing class locations. You will get an email when you are approved.';
+      $('#p-status').textContent = me.status === 'blocked' ? 'This account cannot register for training. Call (213) 260-0061 with questions.' : 'Your account is waiting for approval. JDF confirms every new member before sharing class locations. Check back here, or call (213) 260-0061 with questions.';
       if (me.role === 'staff') $('#p-admin-link').hidden = false;
       show('portal'); load();
     });
@@ -152,11 +162,11 @@
     });
 
     function members() {
-      db.from('profiles').select('id,email,full_name,phone,status,role,created_at').order('created_at', { ascending: false }).then(function (r) {
+      db.rpc('staff_members').then(function (r) {
         $('#a-members').innerHTML = (r.data || []).map(function (m) {
-          return '<tr><td><b>' + esc(m.full_name || 'No name given') + '</b><br>' + esc(m.email) + (m.phone ? '<br>' + esc(m.phone) : '') + '</td><td>' + esc(new Date(m.created_at).toLocaleDateString()) + '</td><td><span class="p-pill ' + (m.status === 'approved' ? 'ok' : 'wait') + '">' + esc(m.status) + '</span>' + (m.role === 'staff' ? ' <span class="p-pill ok">staff</span>' : '') + '</td><td>' +
-            (m.status !== 'approved' ? '<button class="p-link" data-set="approved" data-id="' + m.id + '">Approve</button> ' : '') +
-            (m.status !== 'blocked' ? '<button class="p-link bad" data-set="blocked" data-id="' + m.id + '">Block</button>' : '') + '</td></tr>';
+          return '<tr><td><b>' + esc(m.full_name || 'No name given') + '</b><br>' + esc(m.email) + (m.email_confirmed ? '' : ' <span class="p-pill wait">email not confirmed</span>') + (m.phone ? '<br>' + esc(m.phone) : '') + '</td><td>' + esc(new Date(m.created_at).toLocaleDateString()) + '</td><td><span class="p-pill ' + (m.status === 'approved' ? 'ok' : 'wait') + '">' + esc(m.status) + '</span>' + (m.role === 'staff' ? ' <span class="p-pill ok">staff</span>' : '') + '</td><td>' +
+            (m.status !== 'approved' && m.email_confirmed ? '<button class="p-link" data-set="approved" data-id="' + esc(m.id) + '">Approve</button> ' : '') +
+            (m.status !== 'blocked' ? '<button class="p-link bad" data-set="blocked" data-id="' + esc(m.id) + '">Block</button>' : '') + '</td></tr>';
         }).join('') || '<tr><td colspan="4">No accounts yet.</td></tr>';
       });
     }
@@ -167,7 +177,7 @@
 
     function tracks() {
       db.from('training_tracks').select('id,name').order('sort').then(function (r) {
-        $('#a-track').innerHTML = (r.data || []).map(function (t) { return '<option value="' + t.id + '">' + esc(t.name) + '</option>'; }).join('');
+        $('#a-track').innerHTML = (r.data || []).map(function (t) { return '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>'; }).join('');
       });
     }
 
@@ -181,7 +191,7 @@
           return '<details class="p-admin-session"><summary><b>' + esc(fmtDate(s.starts_at)) + ', ' + esc(fmtTime(s.starts_at)) + '</b> ' + esc(s.title || (s.training_tracks || {}).name) + ' <span class="p-pill ' + (s.status === 'scheduled' ? 'ok' : 'wait') + '">' + esc(s.status) + '</span> ' + regs.length + ' of ' + s.capacity + '</summary>' +
             '<p class="p-loc">' + (l ? '<b>' + esc(l.venue) + '</b> ' + esc(l.address) : 'No location set') + '</p><ul>' +
             (regs.map(function (x) { var p = x.profiles || {}; return '<li>' + esc(p.full_name || p.email) + ' · ' + esc(p.email) + (p.phone ? ' · ' + esc(p.phone) : '') + ' <span class="p-pill ' + (x.status === 'confirmed' ? 'ok' : 'wait') + '">' + esc(x.status) + '</span></li>'; }).join('') || '<li>No registrations yet.</li>') +
-            '</ul>' + (s.status === 'scheduled' ? '<button class="p-link bad" data-cancel-session="' + s.id + '">Cancel this session</button>' : '') + '</details>';
+            '</ul>' + (s.status === 'scheduled' ? '<button class="p-link bad" data-cancel-session="' + esc(s.id) + '">Cancel this session</button>' : '') + '</details>';
         }).join('') || '<p class="p-empty">No sessions yet. Add the first one below.</p>';
       });
     }
