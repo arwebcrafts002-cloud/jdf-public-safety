@@ -1,0 +1,54 @@
+/* ============================================================
+   JDF PUBLIC SAFETY: HELP WIDGET (js/widget.js)
+   ============================================================ */
+.w-root { position: fixed; right: 20px; bottom: 20px; z-index: 950; font-family: var(--font-main); }
+.w-fab {
+  all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+  padding: 13px 20px 13px 16px; border-radius: 999px; color: #fff;
+  background: linear-gradient(135deg, #132247, #0b1329); border: 1px solid rgba(229, 154, 14, .6);
+  box-shadow: 0 14px 34px rgba(7, 13, 30, .45); font: 800 13px var(--font-head); letter-spacing: .08em; text-transform: uppercase;
+  transition: transform .3s cubic-bezier(.2, .7, .2, 1), box-shadow .3s;
+}
+.w-fab:hover { transform: translateY(-3px); box-shadow: 0 20px 44px rgba(7, 13, 30, .55); }
+.w-fab:focus-visible, .w-x:focus-visible, .w-again:focus-visible { outline: 3px solid #e59a0e; outline-offset: 3px; }
+.w-fab svg { width: 22px; height: 22px; fill: none; stroke: #e59a0e; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.js-motion .w-fab { animation: w-in .6s cubic-bezier(.2, .7, .2, 1) 1.2s both; }
+@keyframes w-in { from { opacity: 0; transform: translateY(24px) scale(.9); } }
+.w-root.is-open .w-fab span { display: none; }
+.w-root.is-open .w-fab { padding: 13px; }
+
+.w-panel {
+  position: absolute; right: 0; bottom: 64px; width: min(380px, calc(100vw - 32px)); max-height: min(640px, calc(100vh - 110px)); overflow-y: auto;
+  background: #fff; border-radius: 20px; border: 1px solid var(--border-light); box-shadow: 0 30px 80px rgba(7, 13, 30, .35);
+  transform-origin: 100% 100%; animation: w-pop .35s cubic-bezier(.2, .7, .2, 1);
+}
+@keyframes w-pop { from { opacity: 0; transform: translateY(14px) scale(.94); } }
+.w-panel header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 18px 20px; background: #0b1329; color: #fff; border-radius: 20px 20px 0 0; border-bottom: 3px solid #d97706; }
+.w-panel header b { display: block; font: 800 17px var(--font-head); text-transform: uppercase; letter-spacing: .03em; }
+.w-panel header small { color: #cbd5e1; font-size: 13px; }
+.w-x { all: unset; cursor: pointer; font-size: 26px; line-height: 1; color: #cbd5e1; padding: 0 4px; }
+.w-911 { margin: 0; padding: 10px 20px; background: #fef2f2; color: #991b1b; font-size: 13px; line-height: 1.5; border-bottom: 1px solid #fecaca; }
+.w-911 a { font-weight: 800; text-decoration: underline; }
+.w-panel form { padding: 16px 20px 20px; }
+.w-panel label { display: block; font: 800 11px var(--font-head); letter-spacing: .1em; text-transform: uppercase; color: var(--slate-600); margin: 12px 0 5px; }
+.w-panel select, .w-panel input, .w-panel textarea { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--slate-200); font: 500 15px var(--font-main); color: var(--slate-900); background: #fff; resize: vertical; }
+.w-panel select:focus, .w-panel input:focus, .w-panel textarea:focus { outline: none; border-color: #d97706; box-shadow: 0 0 0 4px rgba(217, 119, 6, .14); }
+.w-panel .bad { border-color: #dc2626; }
+.w-hp { position: absolute !important; left: -9999px; width: 1px !important; height: 1px; opacity: 0; }
+.w-send { width: 100%; margin-top: 16px; }
+.w-note { margin: 10px 0 0; font-size: 13.5px; line-height: 1.5; min-height: 18px; color: var(--slate-600); }
+.w-note.bad { color: #991b1b; }
+.w-note a { font-weight: 800; text-decoration: underline; }
+.w-done { padding: 34px 24px; text-align: center; }
+.w-done svg { width: 54px; height: 54px; fill: none; stroke: #059669; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.w-done b { display: block; font: 800 20px var(--font-head); color: var(--brand-navy); text-transform: uppercase; margin-top: 10px; }
+.w-done p { color: var(--slate-600); font-size: 15px; margin: 6px 0 16px; }
+.w-again { all: unset; cursor: pointer; color: #b45309; font-weight: 800; text-decoration: underline; font-size: 14px; }
+
+/* Sit above the sticky mobile give bar. */
+@media (max-width: 980px) {
+  .w-root { right: 14px; bottom: 86px; }
+  .w-fab span { display: none; }
+  .w-fab { padding: 13px; }
+}
+@media print { .w-root { display: none; } }
