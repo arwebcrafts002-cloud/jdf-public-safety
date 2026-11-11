@@ -24,16 +24,16 @@
   var STAGING = {
     SUPABASE_URL: '',
     SUPABASE_ANON_KEY: '',
-    SQUARE_APPLICATION_ID: '',   // starts with "sandbox-"
-    SQUARE_LOCATION_ID: '',
+    SQUARE_APPLICATION_ID: 'sandbox-sq0idb-rPf-1zves7bdyT1RApzj9Q',   // starts with "sandbox-"
+    SQUARE_LOCATION_ID: 'LXSR7DZG31FYZ',
     SQUARE_ENVIRONMENT: 'sandbox'
   };
 
   var PRODUCTION = {
     SUPABASE_URL: '',
     SUPABASE_ANON_KEY: '',
-    SQUARE_APPLICATION_ID: '',
-    SQUARE_LOCATION_ID: '',
+    SQUARE_APPLICATION_ID: 'sq0idp-AKWRf94FbLGjoclnlj4-2w',
+    SQUARE_LOCATION_ID: 'LADDVTZV7KX70',
     SQUARE_ENVIRONMENT: 'production'
   };
 
