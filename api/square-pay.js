@@ -173,11 +173,12 @@ async function payMonthly(input) {
   if (!card.ok) return { error: card };
 
   // VERIFY (important): how a per-donor amount is set on a subscription.
-  // `price_override_money` is the simple way and is what this uses, but Square
-  // has marked it deprecated in favor of a plan variation with RELATIVE pricing
-  // plus `phases: [{ ordinal: 0, order_template_id }]`, where the order template
-  // is a DRAFT order holding the amount. Confirm which one the pinned
-  // SQUARE_API_VERSION accepts, in the sandbox, before offering monthly giving.
+  // This uses `price_override_money`. Per Square's developer forum (checked
+  // 11 Nov 2026) the override only takes effect when the plan variation uses
+  // STATIC pricing; on a RELATIVE-priced variation it is ignored and the amount
+  // has to live in an order template instead. So the monthly-giving plan must be
+  // created with a static-price variation. Prove it in the sandbox (create a
+  // subscription, check the first invoice amount) before offering monthly giving.
   const sub = await square('POST', '/v2/subscriptions', {
     idempotency_key: input.key + ':s',
     location_id: process.env.SQUARE_LOCATION_ID,

@@ -133,7 +133,7 @@ Do **not** send the donor to the hosted checkout after an error with code `unkno
 
 ## Known gaps
 
-- **Per-donor monthly amounts.** The code sets the amount with `price_override_money`. Square has marked that field deprecated in favor of a relative-priced plan with an order template. Whichever the pinned API version accepts has to be confirmed in the sandbox.
+- **Per-donor monthly amounts.** The code sets the amount with `price_override_money`. Per Square's developer forum (checked 11 Nov 2026), that override only takes effect on a plan variation with static pricing; on a relative-priced variation it is ignored. So the monthly-giving plan must be created with a static-price variation, and the first invoice amount has to be confirmed in the sandbox before monthly giving is offered.
 - **Raw request body on Vercel.** The webhook signature needs the untouched bytes of the request. The code tries three ways to get them and refuses the event if it cannot. Confirm on the deployed project with a test event.
 - **Cancel or change a monthly gift.** Nothing on the site does this yet. Until it exists, David cancels a subscription from the Square Dashboard on request.
 - **Founders Club seat numbers.** The webhook has a marked TODO where the seat number is assigned on a completed founder-level gift.
