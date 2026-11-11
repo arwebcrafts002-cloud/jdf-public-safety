@@ -11,12 +11,19 @@
  * Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, EMAIL_FROM,
  *      STAFF_NOTIFY_TO (optional).
  */
+
+// Supabase keys: a new secret key (sb_secret_...) goes on the apikey header only.
+// A legacy service_role JWT goes on both headers. `bearer` is a signed-in user's token.
+const sbHeaders = (key, bearer) => Object.assign(
+  { apikey: key },
+  bearer ? { Authorization: 'Bearer ' + bearer } : (String(key).startsWith('sb_') ? {} : { Authorization: 'Bearer ' + key })
+);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
 
 async function sb(path, token) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const res = await fetch(process.env.SUPABASE_URL + path, {
-    headers: { apikey: key, Authorization: 'Bearer ' + (token || key) },
+    headers: sbHeaders(key, token),
   });
   if (!res.ok) throw new Error('supabase ' + res.status);
   return res.json();
@@ -37,7 +44,7 @@ async function claim(sessionId, userId) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const r = await fetch(process.env.SUPABASE_URL + '/rest/v1/registrations?session_id=eq.' + sessionId + '&user_id=eq.' + userId + '&notified_at=is.null&status=neq.cancelled', {
     method: 'PATCH',
-    headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    headers: { ...sbHeaders(key), 'Content-Type': 'application/json', Prefer: 'return=representation' },
     body: JSON.stringify({ notified_at: new Date().toISOString() }),
   });
   if (!r.ok) throw new Error('supabase ' + r.status);

@@ -1,0 +1,14 @@
+# The site is served straight from the repo root, so anything uploaded is
+# publicly downloadable. Keep everything that is not a page, asset or API
+# function out of the deployment.
+db/
+docs/
+tools/
+*.md
+*.sql
+*.py
+*.sh
+.env
+.env.*
+*.env
+package-lock.json

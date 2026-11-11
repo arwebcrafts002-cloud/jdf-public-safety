@@ -35,6 +35,13 @@
  * raw Square error, never card details.
  */
 
+// Supabase keys: a new secret key (sb_secret_...) goes on the apikey header only.
+// A legacy service_role JWT goes on both headers. `bearer` is a signed-in user's token.
+const sbHeaders = (key, bearer) => Object.assign(
+  { apikey: key },
+  bearer ? { Authorization: 'Bearer ' + bearer } : (String(key).startsWith('sb_') ? {} : { Authorization: 'Bearer ' + key })
+);
+
 const MIN_CENTS = 100;          // $1
 const MAX_CENTS = 5000000;      // $50,000. Larger gifts go through a person, not a web form.
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -92,7 +99,7 @@ async function sb(method, path, body, prefer) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const res = await fetch(process.env.SUPABASE_URL + '/rest/v1/' + path, {
     method,
-    headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: prefer || 'return=representation' },
+    headers: { ...sbHeaders(key), 'Content-Type': 'application/json', Prefer: prefer || 'return=representation' },
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error('db ' + res.status + ': ' + (await res.text()));

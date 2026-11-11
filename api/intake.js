@@ -17,6 +17,13 @@
  * site tells the visitor to call or email instead. It never pretends.
  */
 
+// Supabase keys: a new secret key (sb_secret_...) goes on the apikey header only.
+// A legacy service_role JWT goes on both headers. `bearer` is a signed-in user's token.
+const sbHeaders = (key, bearer) => Object.assign(
+  { apikey: key },
+  bearer ? { Authorization: 'Bearer ' + bearer } : (String(key).startsWith('sb_') ? {} : { Authorization: 'Bearer ' + key })
+);
+
 const TYPES = {
   donation_intent: 'donation_intents',
   report: 'concern_reports',
@@ -133,8 +140,7 @@ async function insert(table, record) {
   const res = await fetch(process.env.SUPABASE_URL + '/rest/v1/' + table + (table === 'subscribers' ? '?on_conflict=email' : ''), {
     method: 'POST',
     headers: {
-      apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      Authorization: 'Bearer ' + process.env.SUPABASE_SERVICE_ROLE_KEY,
+      ...sbHeaders(process.env.SUPABASE_SERVICE_ROLE_KEY),
       'Content-Type': 'application/json',
       Prefer: table === 'subscribers' ? 'resolution=ignore-duplicates,return=minimal' : 'return=minimal',
     },
