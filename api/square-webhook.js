@@ -16,7 +16,7 @@
  * Environment variables:
  *   SQUARE_WEBHOOK_SIGNATURE_KEY   secret, shown when the webhook subscription is created
  *   SQUARE_WEBHOOK_URL             the exact URL registered with Square, e.g.
- *                                  https://jdfpublicsafety.org/api/square-webhook
+ *                                  https://www.lajdf.com/api/square-webhook
  *                                  (the signature covers this string, so it must match
  *                                  character for character, including https and no trailing slash)
  *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -126,7 +126,7 @@ async function sendReceiptOnce(donation) {
     '<tr><td style="padding:6px 16px 6px 0;color:#64748b">Date</td><td><b>' + esc(date) + '</b></td></tr>' +
     '<tr><td style="padding:6px 16px 6px 0;color:#64748b">Receipt</td><td><b>' + esc(receiptNo) + '</b></td></tr>' + dedication +
     '</table>' + tax +
-    '<p style="font-size:13px;color:#64748b">Questions about this gift: (213) 260-0061 or info@jdfpublicsafety.org.</p></div>';
+    '<p style="font-size:13px;color:#64748b">Questions about this gift: (213) 260-0061 or info@lajdf.com.</p></div>';
 
   try {
     await email([to], 'Thank you for your gift to JDF Public Safety', html);

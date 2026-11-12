@@ -10,7 +10,7 @@
  *   SUPABASE_URL                 https://xxxx.supabase.co
  *   SUPABASE_SERVICE_ROLE_KEY    server-side only, never shipped to the browser
  *   RESEND_API_KEY               optional; without it nothing is emailed
- *   EMAIL_FROM                   e.g. "JDF Public Safety <info@jdfpublicsafety.org>"
+ *   EMAIL_FROM                   e.g. "JDF Public Safety <info@lajdf.com>"
  *   STAFF_NOTIFY_TO              comma-separated staff inboxes
  *
  * If the database variables are missing the endpoint answers 503, and the

@@ -13,7 +13,7 @@
   if (document.body.getAttribute('data-portal') === 'admin') return;
 
   var TOPICS = ['General question', 'Donations and receipts', 'Founders Club', 'Training and classes', 'Request coverage for an institution', 'Volunteering', 'Press', 'Website problem'];
-  var EMAIL = 'info@jdfpublicsafety.org';
+  var EMAIL = 'info@lajdf.com';
 
   var root = document.createElement('div');
   root.className = 'w-root';

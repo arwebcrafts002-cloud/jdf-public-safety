@@ -131,7 +131,7 @@
           : 'background:#7f1d1d;border:1px solid #f87171;color:#fef2f2;padding:16px 20px;border-radius:8px;margin-top:18px;font-weight:700;font-size:14px;line-height:1.6;';
         msg.innerHTML = ok
           ? 'Your submission has been received. Our team will review it promptly.'
-          : 'We could not send this online. Please call the Public Safety Hotline at <a href="tel:2132600061" style="text-decoration:underline;">(213) 260-0061</a> or email <a href="mailto:info@jdfpublicsafety.org" style="text-decoration:underline;">info@jdfpublicsafety.org</a>. For an emergency, call 911.';
+          : 'We could not send this online. Please call the Public Safety Hotline at <a href="tel:2132600061" style="text-decoration:underline;">(213) 260-0061</a> or email <a href="mailto:info@lajdf.com" style="text-decoration:underline;">info@lajdf.com</a>. For an emergency, call 911.';
         form.appendChild(msg);
         if (ok) form.reset();
         if (btn) { btn.textContent = originalText; btn.disabled = false; }

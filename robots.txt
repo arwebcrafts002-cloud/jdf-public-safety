@@ -5,4 +5,4 @@ Disallow: /trainings
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://www.jdfpublicsafety.org/sitemap.xml
+Sitemap: https://www.lajdf.com/sitemap.xml
